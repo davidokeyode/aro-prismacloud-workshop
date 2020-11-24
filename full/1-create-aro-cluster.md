@@ -41,7 +41,7 @@ Azure Red Hat OpenShift clusters require a virtual network with two empty subnet
 > [!NOTE] 
    > Azure Red Hat OpenShift is not available in all regions where an Azure resource group can be created. See [Available regions](https://azure.microsoft.com/en-gb/global-infrastructure/services/?products=openshift&regions=all) for information on where Azure Red Hat OpenShift is supported. Make sure you enter a supported location as your variable below.
 
-   ```console
+   ```
    LOCATION=uksouth       # Modify this to the location that you want your cluster in
    RESOURCEGROUP=aro-workshop-rg   # the name of the resource group where you want to create your cluster           
    CLUSTER=arocluster        # the name of your cluster
@@ -49,7 +49,7 @@ Azure Red Hat OpenShift clusters require a virtual network with two empty subnet
 
 2. **Create a resource group.**
 
-   ```azurecli-interactive
+   ```
    az group create \
      --name $RESOURCEGROUP \
      --location $LOCATION
@@ -59,7 +59,7 @@ Azure Red Hat OpenShift clusters require a virtual network with two empty subnet
 
    Create a new virtual network in the same resource group you created earlier:
 
-   ```azurecli-interactive
+   ```
    az network vnet create \
       --resource-group $RESOURCEGROUP \
       --name aro-vnet \
@@ -68,7 +68,7 @@ Azure Red Hat OpenShift clusters require a virtual network with two empty subnet
 
 3. **Add an empty subnet for the master nodes.**
 The subnet is created with a service endpoint connection to Azure Container Registry (ACR)
-   ```azurecli-interactive
+   ```
    az network vnet subnet create \
      --resource-group $RESOURCEGROUP \
      --vnet-name aro-vnet \
@@ -79,7 +79,7 @@ The subnet is created with a service endpoint connection to Azure Container Regi
 
 4. **Add an empty subnet for the worker nodes.**
 
-   ```azurecli-interactive
+   ```
    az network vnet subnet create \
      --resource-group $RESOURCEGROUP \
      --vnet-name aro-vnet \
@@ -90,7 +90,7 @@ The subnet is created with a service endpoint connection to Azure Container Regi
 
 5. **[Disable subnet private endpoint policies](../private-link/disable-private-link-service-network-policy.md) on the master subnet.** This is required for the service to be able to connect to and manage the cluster.
 
-   ```azurecli-interactive
+   ```
    az network vnet subnet update \
      --name master-subnet \
      --resource-group $RESOURCEGROUP \
@@ -100,7 +100,7 @@ The subnet is created with a service endpoint connection to Azure Container Regi
 
 ## Create the ARO cluster
 
-```azurecli-interactive
+```
 az aro create \
   --resource-group $RESOURCEGROUP \
   --name $CLUSTER \
