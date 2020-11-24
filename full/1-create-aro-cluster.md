@@ -1,15 +1,12 @@
 ---
-title: 1 - Create an Azure Red Hat OpenShift 4 cluster
-description: Follow these instructions to create a Microsoft Azure Red Hat OpenShift cluster using the Azure CLI
-author: David Okeyode
-
-#Customer intent: As a developer, I want learn how to create an Azure Red Hat OpenShift cluster, scale it, and then clean up resources so that I am not charged for what I'm not using.
+Title: 1 - Create an Azure Red Hat OpenShift cluster
+Description: Follow these instructions to create a Microsoft Azure Red Hat OpenShift cluster using the Azure CLI
+Author: David Okeyode
 ---
-
-# Lesson: Create an Azure Red Hat OpenShift 4 cluster
+# Lesson 1: Create an Azure Red Hat OpenShift 4 cluster
 
 In this workshop lesson, you'll create an Azure Red Hat OpenShift cluster running OpenShift 4 in an Azure subscription. You'll be using this cluster for the rest of the lessons in this workshop. Here's what we'll be completing in this lesson:
-> [!div class="checklist"]
+
 > * Setup the prerequisites 
 > * Create the required virtual network and subnets
 > * Deploy the ARO cluster
@@ -17,31 +14,31 @@ In this workshop lesson, you'll create an Azure Red Hat OpenShift cluster runnin
 ## Pre-Requisites (Before you begin)
 
 ### Prepare your Azure subscription
-1. An Azure subscription with either the Owner role assignment OR the Contributor plus User Access Administrator role assignments
+1. Before proceeding with the lesson, you need to have an Azure subscription with either the Owner role assignment OR the Contributor plus User Access Administrator role assignments
 
 2. Azure Red Hat OpenShift requires a minimum of 40 cores to create and run an OpenShift cluster. The default Azure resource quota for a new Azure subscription does not meet this requirement. To request an increase in your resource limit, see [Standard quota: Increase limits by VM series](../azure-portal/supportability/per-vm-quota-requests.md)
 
 ### Register the resource providers
-
+To successfully deploy the ARO cluster, you need to register the **"Microsoft.RedHatOpenShift"** resource provider
 1. If you have multiple Azure subscriptions, specify the relevant subscription ID:
 
-    ```azurecli-interactive
+    ```
     az account set --subscription <SUBSCRIPTION ID>
     ```
 
-1. Register the `Microsoft.RedHatOpenShift` resource provider:
+2. Register the `Microsoft.RedHatOpenShift` resource provider:
 
-    ```azurecli-interactive
+    ```
     az provider register -n Microsoft.RedHatOpenShift --wait
     ```
     
-1. Register the `Microsoft.Compute` resource provider:
+3. Register the `Microsoft.Compute` resource provider:
 
     ```azurecli-interactive
     az provider register -n Microsoft.Compute --wait
     ```
     
-1. Register the `Microsoft.Storage` resource provider:
+4. Register the `Microsoft.Storage` resource provider:
 
     ```azurecli-interactive
     az provider register -n Microsoft.Storage --wait
