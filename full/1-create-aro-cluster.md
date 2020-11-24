@@ -9,105 +9,45 @@ In this workshop lesson, you'll create an Azure Red Hat OpenShift cluster runnin
 
 > * Setup the prerequisites 
 > * Create the required virtual network and subnets
-> * Deploy the ARO cluster
+> * Create the ARO cluster
 
-## Pre-Requisites (Before you begin)
-
+## Setup the prerequisites
 ### Prepare your Azure subscription
 1. Before proceeding with the lesson, you need to have an Azure subscription with either the Owner role assignment OR the Contributor plus User Access Administrator role assignments
 
 2. Azure Red Hat OpenShift requires a minimum of 40 cores to create and run an OpenShift cluster. The default Azure resource quota for a new Azure subscription does not meet this requirement. To request an increase in your resource limit, see [Standard quota: Increase limits by VM series](../azure-portal/supportability/per-vm-quota-requests.md)
 
 ### Register the resource providers
-To successfully deploy the ARO cluster, you need to register the **"Microsoft.RedHatOpenShift"** resource provider
-1. If you have multiple Azure subscriptions, specify the relevant subscription ID:
+To successfully deploy the ARO cluster, you need to register the **"Microsoft.RedHatOpenShift"** resource providers. We will also ensure that the **"Microsoft.Compute"** and **"Microsoft.Storage"** resource providers are also registered.
+
+1. Go to [https://shell.azure.com](https://shell.azure.com) and sign in with your Azure credentials
+
+2. If you have multiple Azure subscriptions, specify the relevant subscription ID:
 
     ```
     az account set --subscription <SUBSCRIPTION ID>
     ```
 
-2. Register the `Microsoft.RedHatOpenShift` resource provider:
+3. Register the three resource providers:
 
     ```
-    az provider register -n Microsoft.RedHatOpenShift --wait
+    az provider register -n Microsoft.RedHatOpenShift -n Microsoft.Compute -n Microsoft.Storage --wait
     ```
-    
-3. Register the `Microsoft.Compute` resource provider:
-
-    ```azurecli-interactive
-    az provider register -n Microsoft.Compute --wait
-    ```
-    
-4. Register the `Microsoft.Storage` resource provider:
-
-    ```azurecli-interactive
-    az provider register -n Microsoft.Storage --wait
-    ```
-
-
-
-
-> * Setup the prerequisites 
-> * Create the required virtual network and subnets
-> * Deploy the ARO cluster
-
-During this tutorial, you will create a resource group, which will contain the virtual network for the cluster. You must have either Contributor and User Access Administrator permissions, or Owner permissions, either directly on the virtual network, or on the resource group or subscription containing it.
-
-You will also need sufficient Azure Active Directory permissions for the tooling to create an application and service principal on your behalf for the cluster.
-
-
-
-
-
-### Get a Red Hat pull secret (optional)
-
-A Red Hat pull secret enables your cluster to access Red Hat container registries along with additional content. This step is optional but recommended.
-
-1. [Navigate to your Red Hat OpenShift cluster manager portal](https://cloud.redhat.com/openshift/install/azure/aro-provisioned) and log in.
-
-   You will need to log in to your Red Hat account or create a new Red Hat account with your business email and accept the terms and conditions.
-
-1. Click **Download pull secret** and download a pull secret to be used with your ARO cluster.
-
-    Keep the saved `pull-secret.txt` file somewhere safe. The file will be used in each cluster creation if you need to create a cluster that includes samples or operators for Red Hat or certified partners.
-
-    When running the `az aro create` command, you can reference your pull secret using the `--pull-secret @pull-secret.txt` parameter. Execute `az aro create` from the directory where you stored your `pull-secret.txt` file. Otherwise, replace `@pull-secret.txt` with `@/path/to/my/pull-secret.txt`.
-
-    If you are copying your pull secret or referencing it in other scripts, your pull secret should be formatted as a valid JSON string.
-
-### Prepare a custom domain for your cluster (optional)
-
-When running the `az aro create` command, you can specify a custom domain for your cluster by using the `--domain foo.example.com` parameter.
-
-If you provide a custom domain for your cluster note the following points:
-
-* After creating your cluster, you must create 2 DNS A records in your DNS server for the `--domain` specified:
-    * **api** - pointing to the api server IP address
-    * **\*.apps** - pointing to the ingress IP address
-    * Retrieve these values by executing the following command after cluster creation: `az aro show -n -g --query '{api:apiserverProfile.ip, ingress:ingressProfiles[0].ip}'`.
-
-* The OpenShift console will be available at a URL such as `https://console-openshift-console.apps.example.com`, instead of the built-in domain `https://console-openshift-console.apps.<random>.<location>.aroapp.io`.
-
-* By default, OpenShift uses self-signed certificates for all of the routes created on custom domains `*.apps.example.com`.  If you choose to use custom DNS after connecting to the cluster, you will need to follow the OpenShift documentation to [configure a custom CA for your ingress controller](https://docs.openshift.com/aro/4/authentication/certificates/replacing-default-ingress-certificate.html) and a [custom CA for your API server](https://docs.openshift.com/aro/4/authentication/certificates/api-server.html).
-
+## Create the required virtual network and subnets
+Azure Red Hat OpenShift clusters require a virtual network with two empty subnets, for the master and worker nodes. In this section, we will create a resource group and then create a virtual network (containing the two empty subnets) for the ARO cluster.
 ### Create a virtual network containing two empty subnets
 
-Next, you will create a virtual network containing two empty subnets.
-
 1. **Set the following variables in the shell environment in which you will execute the `az` commands.**
+> [!NOTE] 
+   > Azure Red Hat OpenShift is not available in all regions where an Azure resource group can be created. See [Available regions](https://azure.microsoft.com/en-gb/global-infrastructure/services/?products=openshift&regions=all) for information on where Azure Red Hat OpenShift is supported. Make sure you enter a supported location as your variable below.
 
    ```console
-   LOCATION=eastus                 # the location of your cluster
-   RESOURCEGROUP=aro-rg            # the name of the resource group where you want to create your cluster
-   CLUSTER=cluster                 # the name of your cluster
+   LOCATION=uksouth       # Modify this to the location that you want your cluster in
+   RESOURCEGROUP=aro-workshop-rg   # the name of the resource group where you want to create your cluster           
+   CLUSTER=arocluster        # the name of your cluster
    ```
 
 2. **Create a resource group.**
-
-   An Azure resource group is a logical group in which Azure resources are deployed and managed. When you create a resource group, you are asked to specify a location. This location is where resource group metadata is stored, and it is also where your resources run in Azure if you don't specify another region during resource creation. Create a resource group using the [az group create](/cli/azure/group?view=azure-cli-latest#az-group-create) command.
-    
-   > [!NOTE] 
-   > Azure Red Hat OpenShift is not available in all regions where an Azure resource group can be created. See [Available regions](https://azure.microsoft.com/en-gb/global-infrastructure/services/?products=openshift) for information on where Azure Red Hat OpenShift is supported.
 
    ```azurecli-interactive
    az group create \
@@ -115,23 +55,7 @@ Next, you will create a virtual network containing two empty subnets.
      --location $LOCATION
    ```
 
-   The following example output shows the resource group created successfully:
-
-   ```json
-   {
-     "id": "/subscriptions/<guid>/resourceGroups/aro-rg",
-     "location": "eastus",
-     "name": "aro-rg",
-     "properties": {
-       "provisioningState": "Succeeded"
-     },
-     "type": "Microsoft.Resources/resourceGroups"
-   }
-   ```
-
 2. **Create a virtual network.**
-
-   Azure Red Hat OpenShift clusters running OpenShift 4 require a virtual network with two empty subnets, for the master and worker nodes.
 
    Create a new virtual network in the same resource group you created earlier:
 
@@ -142,31 +66,8 @@ Next, you will create a virtual network containing two empty subnets.
       --address-prefixes 10.0.0.0/22
    ```
 
-   The following example output shows the virtual network created successfully:
-
-   ```json
-   {
-     "newVNet": {
-       "addressSpace": {
-         "addressPrefixes": [
-           "10.0.0.0/22"
-         ]
-       },
-       "dhcpOptions": {
-         "dnsServers": []
-       },
-       "id": "/subscriptions/<guid>/resourceGroups/aro-rg/providers/Microsoft.Network/virtualNetworks/aro-vnet",
-       "location": "eastus",
-       "name": "aro-vnet",
-       "provisioningState": "Succeeded",
-       "resourceGroup": "aro-rg",
-       "type": "Microsoft.Network/virtualNetworks"
-     }
-   }
-   ```
-
 3. **Add an empty subnet for the master nodes.**
-
+The subnet is created with a service endpoint connection to Azure Container Registry (ACR)
    ```azurecli-interactive
    az network vnet subnet create \
      --resource-group $RESOURCEGROUP \
@@ -197,14 +98,7 @@ Next, you will create a virtual network containing two empty subnets.
      --disable-private-link-service-network-policies true
    ```
 
-## Create the cluster
-
-Run the following command to create a cluster. If you choose to use either of the following options, modify the command accordingly:
-* Optionally, you can [pass your Red Hat pull secret](#get-a-red-hat-pull-secret-optional) which enables your cluster to access Red Hat container registries along with additional content. Add the `--pull-secret @pull-secret.txt` argument to your command.
-* Optionally, you can [use a custom domain](#prepare-a-custom-domain-for-your-cluster-optional). Add the `--domain foo.example.com` argument to your command, replacing `foo.example.com` with your own custom domain.
-
-> [!NOTE]
-> If you're adding any optional arguments to your command, be sure to close the argument on the preceding line of the command with a trailing backslash.
+## Create the ARO cluster
 
 ```azurecli-interactive
 az aro create \
@@ -219,11 +113,10 @@ After executing the `az aro create` command, it normally takes about 35 minutes 
 
 ## Next steps
 
-In this part of the tutorial, you learned how to:
-> [!div class="checklist"]
-> * Set up the prerequisites and create the required virtual network and subnets
-> * Deploy a cluster
+In this lesson, you completed the following:
+> * Setup the prerequisites required for your Azure environment
+> * Create the required virtual network and subnets for the ARO cluster
+> * Create the ARO cluster
 
-Advance to the next tutorial:
-> [!div class="nextstepaction"]
+Proceed to the next lesson:
 > [Connect to an Azure Red Hat OpenShift cluster](tutorial-connect-cluster.md)
