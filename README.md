@@ -19,14 +19,14 @@ The workshop is designed to take approximately 3-4 hours to complete.
 
 |    | Module                   | Format       |
 |----|--------------------------|--------------|
-| 01 | [Create an Azure Red Hat OpenShift (ARO) cluster](pull/1-create-aro-cluster.md)                         | Hands on Lab |
-| 02 | [Connect to the ARO cluster](pull/2-connect-aro-cluster.md) | Hands on Lab |
-| 03 | [Configure Azure AD authentication for ARO](pull/2-connect-aro-cluster.md)                | Hands on Lab |
-| 04 | [Setup Go Microservices project](pull/2-connect-aro-cluster.md) | Hands on Lab |
-| 05 | [Explore ARO Internals](pull/2-connect-aro-cluster.md)              | Hands on Lab |
-| 06 | [Deploy the Prisma Cloud Compute console and defenders](pull/2-connect-aro-cluster.md)  | Hands on Lab |
-| 07 | [Explore Prisma Cloud Compute capabilities](pull/2-connect-aro-cluster.md)                  | Hands on Lab |
-| 08 | [Wrap / Clean Up](pull/2-connect-aro-cluster.md)     | Hands on Lab |
+| 01 | [Create an Azure Red Hat OpenShift (ARO) cluster](full/1-create-aro-cluster.md)                         | Hands on Lab |
+| 02 | [Connect to the ARO cluster](full/2-connect-aro-cluster.md) | Hands on Lab |
+| 03 | [Configure Azure AD authentication for ARO](full/2-connect-aro-cluster.md)                | Hands on Lab |
+| 04 | [Setup Go Microservices project](full/2-connect-aro-cluster.md) | Hands on Lab |
+| 05 | [Explore ARO Internals](full/2-connect-aro-cluster.md)              | Hands on Lab |
+| 06 | [Deploy the Prisma Cloud Compute console and defenders](full/2-connect-aro-cluster.md)  | Hands on Lab |
+| 07 | [Explore Prisma Cloud Compute capabilities](full/2-connect-aro-cluster.md)                  | Hands on Lab |
+| 08 | [Wrap / Clean Up](full/2-connect-aro-cluster.md)     | Hands on Lab |
 ----
 
 [![Next](img/get_started.png)](./01_intro.md)
