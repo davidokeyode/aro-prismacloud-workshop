@@ -1,7 +1,6 @@
 ## Welcome
 
-Welcome to the Prisma Cloud Azure RedHat OpenShift (ARO) workshop! This workshop was created as a walkthrough for an in person or virtual workshop, however you may feel free to run through at your own pace.
-
+Welcome to the Prisma Cloud Azure RedHat OpenShift (ARO) workshop! This workshop was created as a walkthrough for an in person or virtual workshop, however you may feel free to run through at your own pace. The workshop extends the updates and extends the instructions [here](https://aroworkshop.io/?WT.mc_id=AZ-MVP-5003870) to include the deployment of the ARO cluster and how to protect it with Prisma Cloud Compute.
 ### Some Pre-requisites
 
 * An Azure Subscription
@@ -11,7 +10,6 @@ Welcome to the Prisma Cloud Azure RedHat OpenShift (ARO) workshop! This workshop
 
 * A Prisma Cloud Compute license
   * This can be either a Prisma Cloud Compute license only or a Prisma Cloud Enterprise license
-
 
 ### Agenda
 
@@ -29,4 +27,4 @@ The workshop is designed to take approximately 3-4 hours to complete.
 | 08 | [Wrap / Clean Up](full/2-connect-aro-cluster.md)     | Hands on Lab |
 ----
 
-[![Next](img/get_started.png)](./01_intro.md)
+[Next](full/1-create-aro-cluster.md)
