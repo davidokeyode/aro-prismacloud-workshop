@@ -1,15 +1,17 @@
 ---
-Title: 1 - Create an Azure Red Hat OpenShift cluster
-Description: Follow these instructions to create a Microsoft Azure Red Hat OpenShift cluster using the Azure CLI
+Title: 2 - Connect to the ARO cluster
+Description: Follow these instructions to connect to the ARO cluster that was created in the last lesson
 Author: David Okeyode
 ---
-# Lesson 1: Create an Azure Red Hat OpenShift 4 cluster
+# Lesson 2: Connect to the ARO cluster
 
-In this workshop lesson, you'll create an Azure Red Hat OpenShift cluster running OpenShift 4 in an Azure subscription. You'll be using this cluster for the rest of the lessons in this workshop. Here's what we'll be completing in this lesson:
+In the previous lesson, an ARO cluster was created. If you have not completed this lesson, you can refer to it [here](1-create-aro-cluster.md).
+In this workshop lesson, you will connect to the cluster as the kubeadmin user through the OpenShift web console. You'll be using this cluster for the rest of the lessons in this workshop. Here's what we'll be completing in this lesson:
 
-> * Setup the prerequisites 
-> * Create the required virtual network and subnets
-> * Create the ARO cluster
+> * Obtain `kubeadmin` credentials for your cluster
+> * Connect to the cluster using the OpenShift web console
+> * Install the OpenShift CLI
+> * Connect to the cluster using the OpenShift CLI
 
 ## Setup the prerequisites
 ### Prepare your Azure subscription

@@ -3,9 +3,9 @@ Title: 1 - Create an Azure Red Hat OpenShift cluster
 Description: Follow these instructions to create a Microsoft Azure Red Hat OpenShift cluster using the Azure CLI
 Author: David Okeyode
 ---
-# Lesson 1: Create an Azure Red Hat OpenShift 4 cluster
+# Lesson 1: Create an Azure Red Hat OpenShift cluster
 
-In this workshop lesson, you'll create an Azure Red Hat OpenShift cluster running OpenShift 4 in an Azure subscription. You'll be using this cluster for the rest of the lessons in this workshop. Here's what we'll be completing in this lesson:
+In this workshop lesson, you'll create an Azure Red Hat OpenShift cluster running OpenShift in an Azure subscription. You'll be using this cluster for the rest of the lessons in this workshop. Here's what we'll be completing in this lesson:
 
 > * Setup the prerequisites 
 > * Create the required virtual network and subnets
@@ -20,7 +20,7 @@ In this workshop lesson, you'll create an Azure Red Hat OpenShift cluster runnin
 ### Register the resource providers
 To successfully deploy the ARO cluster, you need to register the **"Microsoft.RedHatOpenShift"** resource providers. We will also ensure that the **"Microsoft.Compute"** and **"Microsoft.Storage"** resource providers are also registered.
 
-1. Go to [https://shell.azure.com](https://shell.azure.com) and sign in with your Azure credentials
+1. Go to [Azure Cloud Shell](https://shell.azure.com) and sign in with your credentials
 
 2. If you have multiple Azure subscriptions, specify the relevant subscription ID:
 
