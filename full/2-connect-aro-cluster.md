@@ -89,14 +89,14 @@ You should receive a **Login successful** response after running the command
 
 If you receive an error message, check that the variable values are correct using the `echo` command. You may need to run previous commands to set the values in your session.
 
-![Screenshot that shows successful command line login](img/2-aro-oc-login.png)
+![Screenshot that shows successful command line login](../img/2-aro-oc-login.png)
 
 
 5. Verify connectivity using a few `oc` commands
 ```
 oc get projects # show all projects that the current login has access to
 ```
-* For a full reference of hos to use the `oc` command line tool, refer to the documentations below:
+* For a full reference of how to use the `oc` command line tool, refer to the documentations below:
    * [Administrator CLI commands](https://docs.openshift.com/container-platform/4.6/cli_reference/openshift_cli/administrator-cli-commands.html)
    * [Developer CLI commands](https://docs.openshift.com/container-platform/4.6/cli_reference/openshift_cli/developer-cli-commands.html)
 
