@@ -53,7 +53,7 @@ echo $consoleURL
 ```
 
 5. **Launch the console URL in a browser and login using the `kubeadmin` credentials.**
-![Azure Red Hat OpenShift login screen](img/2-aro-console-login.png)
+![Azure Red Hat OpenShift login screen](../img/2-aro-console-login.png)
 
 6. Keep the console open as you will be downloading the OpenShift command line tool in from here in an upcoming task
 
@@ -74,7 +74,7 @@ echo 'export PATH=$PATH:~/openshift' >> ~/.bashrc && source ~/.bashrc
 ```
 2. **OPTIONAL - If you are using a local shell session, use the following instructions to download and apply the command line tool. Skip this if you are using Azure CloudShell and go to step 3.**
 *In the OpenShift Web Console, click on the **?** on the top right and then on **Command Line Tools**. Download the release appropriate to your machine.
-![Screenshot that highlights the Command Line Tools option in the list when you select the ? icon.](img/2-aro-download-cli.png)
+![Screenshot that highlights the Command Line Tools option in the list when you select the ? icon.](../img/2-aro-download-cli.png)
 
 3. **Retrieve the ARO cluster API server's address**
 ```
