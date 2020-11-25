@@ -6,119 +6,109 @@ Author: David Okeyode
 # Lesson 2: Connect to the ARO cluster
 
 In the previous lesson, an ARO cluster was created. If you have not completed this lesson, you can refer to it [here](1-create-aro-cluster.md).
-In this workshop lesson, you will connect to the cluster as the kubeadmin user through the OpenShift web console. You'll be using this cluster for the rest of the lessons in this workshop. Here's what we'll be completing in this lesson:
+In this workshop lesson, you will connect to the cluster as the kubeadmin user through the OpenShift web console and the OpenShift CLI. You'll be using this cluster for the rest of the lessons in this workshop. Here's what we'll be completing:
 
-> * Obtain `kubeadmin` credentials for your cluster
-> * Connect to the cluster using the OpenShift web console
-> * Install the OpenShift CLI
-> * Connect to the cluster using the OpenShift CLI
+> * Connect to the ARO cluster using the OpenShift web console
+> * Connect to the ARO cluster using the OpenShift CLI
 
-## Setup the prerequisites
-### Prepare your Azure subscription
-1. Before proceeding with the lesson, you need to have an Azure subscription with either the Owner role assignment OR the Contributor plus User Access Administrator role assignments
+## Connect to the cluster using the OpenShift web console
+In this section, we will be completing the following tasks
+* Obtain `kubeadmin` credentials for your ARO cluster
+* Obtain the ARO cluster console URL
+* Connect to the cluster web console using the `kubeadmin` credentials
 
-2. Azure Red Hat OpenShift requires a minimum of 40 cores to create and run an OpenShift cluster. The default Azure resource quota for a new Azure subscription does not meet this requirement. To request an increase in your resource limit, see [Standard quota: Increase limits by VM series](https://docs.microsoft.com/en-us/azure/azure-portal/supportability/per-vm-quota-requests?WT.mc_id=AZ-MVP-5003870)
+1. Go to [Azure Cloud Shell](https://shell.azure.com) and sign in with your credentials
 
-### Register the resource providers
-To successfully deploy the ARO cluster, you need to register the **"Microsoft.RedHatOpenShift"** resource providers. We will also ensure that the **"Microsoft.Compute"** and **"Microsoft.Storage"** resource providers are also registered.
-
-1. Go to [https://shell.azure.com](https://shell.azure.com) and sign in with your Azure credentials
-
-2. If you have multiple Azure subscriptions, specify the relevant subscription ID:
-
-    ```
-    az account set --subscription <SUBSCRIPTION ID>
-    ```
-
-3. Register the three resource providers:
-
-    ```
-    az provider register -n Microsoft.RedHatOpenShift -n Microsoft.Compute -n Microsoft.Storage --wait
-    ```
-## Create the required virtual network and subnets
-Azure Red Hat OpenShift clusters require a virtual network with two empty subnets, for the master and worker nodes. In this section, we will create a resource group and then create a virtual network (containing the two empty subnets) for the ARO cluster.
-### Create a virtual network containing two empty subnets
-
-1. **Set the following variables in the shell environment in which you will execute the `az` commands.**
-> [!NOTE] 
-   > Azure Red Hat OpenShift is not available in all regions where an Azure resource group can be created. See [Available regions](https://azure.microsoft.com/en-gb/global-infrastructure/services/?products=openshift&regions=all) for information on where Azure Red Hat OpenShift is supported. Make sure you enter a supported location as your variable below.
-
+2. **Set the following variables in the shell environment in which you will execute the `az` commands.**
    ```
-   LOCATION=uksouth       # Modify this to the location that you want your cluster in
-   RESOURCEGROUP=aro-workshop-rg   # the name of the resource group where you want to create your cluster           
+   LOCATION=uksouth       # the location of your cluster
+   RESOURCEGROUP=aro-workshop-rg   # the resource group of your cluster that you created in the last lesson           
    CLUSTER=arocluster        # the name of your cluster
    ```
-
-2. **Create a resource group.**
-
-   ```
-   az group create \
-     --name $RESOURCEGROUP \
-     --location $LOCATION
-   ```
-
-2. **Create a virtual network.**
-
-   Create a new virtual network in the same resource group you created earlier:
-
-   ```
-   az network vnet create \
-      --resource-group $RESOURCEGROUP \
-      --name aro-vnet \
-      --address-prefixes 10.0.0.0/22
-   ```
-
-3. **Add an empty subnet for the master nodes.**
-The subnet is created with a service endpoint connection to Azure Container Registry (ACR)
-   ```
-   az network vnet subnet create \
-     --resource-group $RESOURCEGROUP \
-     --vnet-name aro-vnet \
-     --name master-subnet \
-     --address-prefixes 10.0.0.0/23 \
-     --service-endpoints Microsoft.ContainerRegistry
-   ```
-
-4. **Add an empty subnet for the worker nodes.**
-
-   ```
-   az network vnet subnet create \
-     --resource-group $RESOURCEGROUP \
-     --vnet-name aro-vnet \
-     --name worker-subnet \
-     --address-prefixes 10.0.2.0/23 \
-     --service-endpoints Microsoft.ContainerRegistry
-   ```
-
-5. **[Disable subnet private endpoint policies](../private-link/disable-private-link-service-network-policy.md) on the master subnet.** This is required for the service to be able to connect to and manage the cluster.
-
-   ```
-   az network vnet subnet update \
-     --name master-subnet \
-     --resource-group $RESOURCEGROUP \
-     --vnet-name aro-vnet \
-     --disable-private-link-service-network-policies true
-   ```
-
-## Create the ARO cluster
-
+3. **Obtain the `kubeadmin` user password**
+* We will store this value in a variable called **kubeadminpass**
 ```
-az aro create \
-  --resource-group $RESOURCEGROUP \
+kubeadminpass=$(az aro list-credentials \
   --name $CLUSTER \
-  --vnet aro-vnet \
-  --master-subnet master-subnet \
-  --worker-subnet worker-subnet
+  --resource-group $RESOURCEGROUP \
+  --query kubeadminPassword -o tsv)
+```
+```
+echo $kubeadminpass
 ```
 
-After executing the `az aro create` command, it normally takes about 35 minutes to create a cluster.
+4. **Obtain the cluster console URL**
+* The URL will be in the following format: `https://console-openshift-console.apps.<random>.<region>.aroapp.io/`
+* This domain name is publicly reachable because it is registered in BOTH the private DNS zone that was automatically created during the setup in the CoreDNS instance used by your ARO cluster.
+* We will store this value in a variable called **consoleURL**
+
+```
+ consoleURL=$(az aro show \
+    --name $CLUSTER \
+    --resource-group $RESOURCEGROUP \
+    --query "consoleProfile.url" -o tsv)
+```
+```
+echo $consoleURL
+```
+
+5. **Launch the console URL in a browser and login using the `kubeadmin` credentials.**
+![Azure Red Hat OpenShift login screen](img/2-aro-console-login.png)
+
+6. Keep the console open as you will be downloading the OpenShift command line tool in from here in an upcoming task
+
+## Connect to the cluster using the OpenShift CLI
+In this section, we will be completing the following tasks:
+* Download and install the OpenShift CLI in Azure CloudShell
+* Retrieve the ARO cluster API server's address
+* Login to the ARO cluster API server using the kubeadmin credentials
+
+1. **Download and install the latest OpenShift 4 CLI for Linux in Azure CloudShell using the following commands**
+```
+cd ~
+wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
+
+mkdir openshift
+tar -zxvf openshift-client-linux.tar.gz -C openshift
+echo 'export PATH=$PATH:~/openshift' >> ~/.bashrc && source ~/.bashrc
+```
+2. **OPTIONAL - If you are using a local shell session, use the following instructions to download and apply the command line tool. Skip this if you are using Azure CloudShell and go to step 3.**
+*In the OpenShift Web Console, click on the **?** on the top right and then on **Command Line Tools**. Download the release appropriate to your machine.
+![Screenshot that highlights the Command Line Tools option in the list when you select the ? icon.](img/2-aro-download-cli.png)
+
+3. **Retrieve the ARO cluster API server's address**
+```
+apiServer=$(az aro show -g $RESOURCEGROUP -n $CLUSTER --query apiserverProfile.url -o tsv)
+```
+
+4. **Login to the OpenShift cluster's API server using the kubeadmin credentials**
+```
+oc login $apiServer -u kubeadmin -p $kubeadminpass
+```
+You should receive a **Login successful** response after running the command
+
+If you receive an error message, check that the variable values are correct using the `echo` command. You may need to run previous commands to set the values in your session.
+
+![Screenshot that shows successful command line login](img/2-aro-oc-login.png)
+
+
+5. Verify connectivity using a few `oc` commands
+```
+oc get projects # show all projects that the current login has access to
+```
+* For a full reference of hos to use the `oc` command line tool, refer to the documentations below:
+   * [Administrator CLI commands](https://docs.openshift.com/container-platform/4.6/cli_reference/openshift_cli/administrator-cli-commands.html)
+   * [Developer CLI commands](https://docs.openshift.com/container-platform/4.6/cli_reference/openshift_cli/developer-cli-commands.html)
 
 ## Next steps
 
 In this lesson, you completed the following:
-> * Setup the prerequisites required for your Azure environment
-> * Create the required virtual network and subnets for the ARO cluster
-> * Create the ARO cluster
+* Obtained the `kubeadmin` credentials for your cluster
+* Obtained the cluster console URL
+* Connected to the cluster web console using the `kubeadmin` credentials
+* Downloaded and installed the OpenShift CLI in Azure CloudShell
+* Retrieved the ARO cluster API server's address
+* Connected to the ARO cluster API server using the kubeadmin credentials
 
-Proceed to the next lesson:
-> [Connect to the ARO cluster](2-connect-aro-cluster.md)
+In the next lesson, you will configure Azure AD authentication for your ARO cluster. Click here to proceed to the next lesson:
+> [Configure Azure AD authentication for ARO](3-configure-aro-azuread.md)
