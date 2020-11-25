@@ -108,8 +108,26 @@ az aro create \
   --master-subnet master-subnet \
   --worker-subnet worker-subnet
 ```
-
 After executing the `az aro create` command, it normally takes about 35 minutes to create a cluster.
+
+## What was deployed?
+* An Azure AD app registration
+* Resource group created
+   * The master and worker nodes are contained here
+   * The Azure AD App is granted the contributor role assignment to resource group
+   * Three master nodes in the **"master-subnet"** (with 1TB Premium SSD OS disks)
+   * Three worker nodes in the **"worker-subnet"** (with 128GB Premium SSD OS disks)
+* An internal load balancer (with a private IP address)
+* An external load balancer (with two public IP addresses)
+   * The first public IP address is used to load balance TCP port 6443 to all nodes (it is also used for outbound connections from all nodes – masters and workers)
+   * The second public IP address by default load balances TCP ports 80 and 443 to all nodes
+* A private link service
+   * Used for the private connection with the Azure Red Hat OpenShift services that manages the cluster
+* A private DNS zone
+   * *apps -> ingress path for externally available paths pointing to the second public IP of the external load balancer
+   * This DNS zone is automatically linked to the virtual network
+
+**For a more detailed description of the architecture, please refer to [this diagram](https://docs.microsoft.com/en-us/azure/openshift/media/concepts-networking/aro4-networking-diagram.png) and [this document](https://docs.microsoft.com/en-us/azure/openshift/concepts-networking)** 
 
 ## Next steps
 
