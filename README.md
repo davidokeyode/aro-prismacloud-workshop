@@ -25,11 +25,11 @@ The workshop is designed to take approximately 5-6 hours to complete. It can be 
 | 01 | [Create an Azure Red Hat OpenShift (ARO) cluster](full/1-create-aro-cluster.md)                         | Hands on Lab |
 | 02 | [Connect to the ARO cluster](full/2-connect-aro-cluster.md) | Hands on Lab |
 | 03 | [Configure Azure AD authentication for ARO](full/3-configure-aro-azuread.md)                | Hands on Lab |
-| 04 | [Setup Go Microservices project](full/2-connect-aro-cluster.md) | Hands on Lab |
-| 05 | [Explore ARO Internals](full/2-connect-aro-cluster.md)              | Hands on Lab |
-| 06 | [Deploy the Prisma Cloud Compute console and defenders](full/2-connect-aro-cluster.md)  | Hands on Lab |
-| 07 | [Explore Prisma Cloud Compute capabilities](full/2-connect-aro-cluster.md)                  | Hands on Lab |
-| 08 | [Wrap / Clean Up](full/2-connect-aro-cluster.md)     | Hands on Lab |
+| 04 | Setup Go Microservices project | Hands on Lab |
+| 05 | Explore ARO Internals              | Hands on Lab |
+| 06 | Deploy the Prisma Cloud Compute console and defenders  | Hands on Lab |
+| 07 | Explore Prisma Cloud Compute capabilities                  | Hands on Lab |
+| 08 | Wrap / Clean Up     | Hands on Lab |
 ----
 
 [Next](full/1-create-aro-cluster.md)
