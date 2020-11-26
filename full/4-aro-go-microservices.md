@@ -4,19 +4,30 @@ Description: Follow these instructions to You will be deploying a ratings applic
 Author: David Okeyode
 ---
 # Lesson 4: Deploy a Ratings application in the ARO cluster
-
 In this workshop lesson, you will be deploying a ratings application in your ARO cluster. 
-
-| Component                                          | Link                                                               |
-|----------------------------------------------------|--------------------------------------------------------------------|
-| * A MongoDB with pre-loaded data                   | * [Data](https://github.com/microsoft/rating-api/raw/master/data.tar.gz)             |
-| * A public facing API `rating-api`
+![Application](../img/4-app-overview.png)
+* **A MongoDB with pre-loaded data**
+   * [Link to the pre-loaded data](https://github.com/microsoft/rating-api/raw/master/data.tar.gz)
+   * 
+* **A public facing API `rating-api`**
    * A NodeJS application that connects to mongoDB container app to retrieve and rate items
    * The container exposes port 8080
    * MongoDB connection is configured using an environment variable called MONGODB_URI
-   * We’ll build the container app using the [source-to-image (S2I) build strategy](https://aroworkshop.io/#source-to-image-s2i)         | [GitHub repo](https://github.com/microsoft/rating-web)             |
-| A MongoDB with pre-loaded data                     | [Data](https://github.com/microsoft/rating-api/raw/master/data.tar.gz)   |
+   * We’ll build the container app using the [source-to-image (S2I) build strategy](https://aroworkshop.io/#source-to-image-s2i)
+   * [App GitHub repo](https://github.com/microsoft/rating-api)
+* **A public facing web frontend `rating-web`**
+   * A NodeJS application that connects to the rating-api container app 
+   * The web app connects to the API over the internal cluster DNS, using a proxy through an environment variable named API
+   * The container exposes port 8080
+   * ratings-api connection is configured using an environment variable called `API` 
+   * We'll build the container app using the [source-to-image (S2I) build strategy](https://aroworkshop.io/#source-to-image-s2i)
+   * [App GitHub repo](https://github.com/microsoft/rating-web)  
 
+Once you're done, you'll have an experience similar to the below.
+
+![Application](../img/4-app-overview-1.png)
+![Application](../img/4-app-overview-2.png)
+![Application](../img/4-app-overview-3.png)
 
 
 Here's what we'll be completing in this lesson:
