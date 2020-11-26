@@ -1,6 +1,8 @@
 ## Welcome
 
-Welcome to the Prisma Cloud Azure RedHat OpenShift (ARO) workshop! This workshop was created as a walkthrough for an in person or virtual workshop, however you may feel free to run through at your own pace. The workshop extends the updates and extends the instructions [here](https://aroworkshop.io/?WT.mc_id=AZ-MVP-5003870) to include the deployment of the ARO cluster and how to protect it with Prisma Cloud Compute.
+Welcome to the Prisma Cloud Azure RedHat OpenShift (ARO) workshop! ARO is a fully managed Red Hat OpenShift service in Azure that is jointly engineered and supported by Microsoft and Red Hat. In this workshop, you'll go through a set of tasks that will help you understand some of the concepts of deploying an ARO cluster in Azure, configuring Azure AD authentication for it, deploying and securing container based applications on top of ARO and securing it with the Prisma Cloud Compute solution.
+
+This workshop was created as a walkthrough for an in person or virtual workshop, however you may feel free to run through at your own pace. The workshop updates and extends the instructions in the [original workshop here](https://aroworkshop.io/?WT.mc_id=AZ-MVP-5003870) to include the deployment of the ARO cluster and how to protect it with Prisma Cloud Compute solution.
 ### Some Pre-requisites
 
 * An Azure Subscription
