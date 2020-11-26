@@ -127,6 +127,8 @@ After executing the `az aro create` command, it normally takes about 35 minutes 
    * *apps -> ingress path for externally available paths pointing to the second public IP of the external load balancer
    * This DNS zone is automatically linked to the virtual network
 
+![Azure Red Hat OpenShift cluster](../img/1-aro-cluster.png)
+
 **For a more detailed description of the architecture, please refer to [this diagram](https://docs.microsoft.com/en-us/azure/openshift/media/concepts-networking/aro4-networking-diagram.png) and [this document](https://docs.microsoft.com/en-us/azure/openshift/concepts-networking)** 
 
 ## Next steps
