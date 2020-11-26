@@ -1,15 +1,31 @@
 ---
-Title: 1 - Create an Azure Red Hat OpenShift cluster
-Description: Follow these instructions to create a Microsoft Azure Red Hat OpenShift cluster using the Azure CLI
+Title: 4 - Deploy a Ratings application in the ARO cluster
+Description: Follow these instructions to You will be deploying a ratings application in the ARO cluster
 Author: David Okeyode
 ---
-# Lesson 1: Create an Azure Red Hat OpenShift 4 cluster
+# Lesson 4: Deploy a Ratings application in the ARO cluster
 
-In this workshop lesson, you'll create an Azure Red Hat OpenShift cluster running OpenShift 4 in an Azure subscription. You'll be using this cluster for the rest of the lessons in this workshop. Here's what we'll be completing in this lesson:
+In this workshop lesson, you will be deploying a ratings application in your ARO cluster. 
 
-> * Setup the prerequisites 
-> * Create the required virtual network and subnets
-> * Create the ARO cluster
+| Component                                          | Link                                                               |
+|----------------------------------------------------|--------------------------------------------------------------------|
+| * A MongoDB with pre-loaded data                   | * [Data](https://github.com/microsoft/rating-api/raw/master/data.tar.gz)             |
+| * A public facing API `rating-api`
+   * A NodeJS application that connects to mongoDB container app to retrieve and rate items
+   * The container exposes port 8080
+   * MongoDB connection is configured using an environment variable called MONGODB_URI
+   * We’ll build the container app using the [source-to-image (S2I) build strategy](https://aroworkshop.io/#source-to-image-s2i)         | [GitHub repo](https://github.com/microsoft/rating-web)             |
+| A MongoDB with pre-loaded data                     | [Data](https://github.com/microsoft/rating-api/raw/master/data.tar.gz)   |
+
+
+
+Here's what we'll be completing in this lesson:
+
+> * Creating a [project](https://docs.openshift.com/aro/4/applications/projects/working-with-projects.html) on the Azure Red Hat OpenShift Web Console
+> * Deploying a MongoDB container that uses Azure Disks for [persistent storage](https://docs.openshift.com/aro/4/storage/understanding-persistent-storage.html)
+> * Deploying a Node JS API and frontend app from Git Hub using [Source-To-Image (S2I)](https://docs.openshift.com/aro/4/openshift_images/create-images.html)
+> * Exposing the web application frontend using [Routes](https://docs.openshift.com/aro/4/networking/routes/route-configuration.html)
+> * Creating a [network policy](https://docs.openshift.com/aro/4/networking/network_policy/about-network-policy.html) to control communication between the different tiers in the application
 
 ## Setup the prerequisites
 ### Prepare your Azure subscription

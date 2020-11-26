@@ -13,9 +13,12 @@ This workshop was created as a walkthrough for an in person or virtual workshop,
 * A Prisma Cloud Compute license
   * This can be either a Prisma Cloud Compute license only or a Prisma Cloud Enterprise license
 
+* A GitHub Account
+  * You'll need a personal GitHub account. You can sign up for free [here](https://github.com/join).
+
 ### Agenda
 
-The workshop is designed to take approximately 3-4 hours to complete. 
+The workshop is designed to take approximately 5-6 hours to complete. It can be spread out over a 1 day or 2 days workshop.
 
 |    | Module                   | Format       |
 |----|--------------------------|--------------|
