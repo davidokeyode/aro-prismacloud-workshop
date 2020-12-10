@@ -99,6 +99,8 @@ The subnet is created with a service endpoint connection to Azure Container Regi
    ```
 
 ## Download a Red Hat pull secret
+> * We will be using Red Hat provided templates later in this workshop. In order to be able to get these, an image pull secret needs to be acquired from Red Hat.
+
 * Browse to [https://cloud.redhat.com/openshift/install/azure/aro-provisioned](https://cloud.redhat.com/openshift/install/azure/aro-provisioned)
 * Enter your RedHat username and click "Next" (Use the "Create one now" option if you don't have an existing account)
 
@@ -130,7 +132,8 @@ az aro create \
   --name $CLUSTER \
   --vnet aro-vnet \
   --master-subnet master-subnet \
-  --worker-subnet worker-subnet
+  --worker-subnet worker-subnet \
+  --pull-secret @pull-secret.txt
 ```
 After executing the `az aro create` command, it normally takes about 35 minutes to create a cluster.
 
