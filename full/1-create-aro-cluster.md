@@ -98,6 +98,30 @@ The subnet is created with a service endpoint connection to Azure Container Regi
      --disable-private-link-service-network-policies true
    ```
 
+## Download a Red Hat pull secret
+* Browse to [https://cloud.redhat.com/openshift/install/azure/aro-provisioned](https://cloud.redhat.com/openshift/install/azure/aro-provisioned)
+* Enter your RedHat username and click "Next" (Use the "Create one now" option if you don't have an existing account)
+
+![Red Hat Login](../img/1-redhat-login-username.png)
+
+* Enter your RedHat password and click on "Login"
+
+![Red Hat Login](../img/1-redhat-login-password.png)
+
+* Click on "Download pull secret" to download the pull secret text file
+
+![Red Hat Pull Secret](../img/1-redhat-pull-secret.png)
+
+* In Azure CloudShell, click on the "Upload/Download files" icon then click on "Upload" 
+
+![Cloud Shell Pull Secret Upload](../img/1-uploaded-file.png)
+
+* Select the pullsecret to upload
+* Confirm upload with the "ls" command
+
+![Verify Uploaded Pull Secret](../img/1-upload-pull-secret.png)
+
+
 ## Create the ARO cluster
 
 ```

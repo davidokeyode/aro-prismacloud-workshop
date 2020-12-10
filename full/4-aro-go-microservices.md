@@ -89,12 +89,11 @@ oc login $apiServer -u kubeadmin -p $kubeadminpass
    * You should receive a **Login successful** response after running the command
 * Create a new openshift project
 ```
-    oc new-project ratings-project \
-        --display-name="ratings-project" --description="Sample Ratings Project"
+    oc new-project workshop \
 ``` 
 * Set your current project to the newly created one
 ```
-    oc project ratings-project
+    oc project workshop
 ```
 
 4. **Extra Information. Services will be available at the following address:**
@@ -104,12 +103,13 @@ oc login $apiServer -u kubeadmin -p $kubeadminpass
 
 ## Create the MongoDB container app
 1. **Create mongoDB from template**
-    - Create a mongoDB deployment using the `mongodb-persistent` template. You’re passing in the values to be replaced (username, password and database) which generates a YAML/JSON file. You then pipe it to the `oc create` command.
-    # View available templates using the command below
-    # The templates are preinstalled in the openshift namespace
+* ARO provides a container image and template to make creating a new MongoDB database service easy. We will use the `mongodb-persistent` template to define both a deployment configuration and a service.
+
+* View available templates using the command below. The templates are preinstalled in the openshift namespace.
+```
     oc get templates -n openshift
-    
-    # Deploy
+```
+* Deploy
     oc process openshift//mongodb-persistent \
         -p MONGODB_USER=ratingsuser \
         -p MONGODB_PASSWORD=ratingspassword \
