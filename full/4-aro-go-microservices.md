@@ -40,127 +40,91 @@ Here's what we'll be completing in this lesson:
 > * Creating a [network policy](https://docs.openshift.com/aro/4/networking/network_policy/about-network-policy.html) to control communication between the different tiers in the application
 
 
-## Create an OpenShift Project
-1. **Obtain the kubeadmin credentials using the command below**
-   ```
-   LOCATION=uksouth       # the location of your cluster
-   RESOURCEGROUP=aro-workshop-rg   # the resource group of your cluster that you created in the last lesson           
-   CLUSTER=arocluster        # the name of your cluster
-   ```
-```
-    az aro list-credentials \
-      --name $CLUSTER \
-      --resource-group $RESOURCEGROUP
-```
+## Exercise 1 - Create an OpenShift Project
+1. **Create an OpenShift project**
+>* A project allows a community of users to organize and manage their content in isolation from other communities.
 
-2. **Connect to the OpenShift cluster web console**
-* Obtain the URL of the web console using the command
-```
- consoleURL=$(az aro show \
-    --name $CLUSTER \
-    --resource-group $RESOURCEGROUP \
-    --query "consoleProfile.url" -o tsv)
-```
-```
-echo $consoleURL
-```
-
-3. **Create an OpenShift project**
-* Open [Azure Cloud Shell](https://shell.azure.com) with OpenShift CLI (oc) installed from the previous task
-* Retrieve the `kubeadmin` user password
-   * We will store this value in a variable called **kubeadminpass**
-```
-kubeadminpass=$(az aro list-credentials \
-  --name $CLUSTER \
-  --resource-group $RESOURCEGROUP \
-  --query kubeadminPassword -o tsv)
-```
-```
-echo $kubeadminpass
-```
-* Retrieve the ARO cluster API server's address
-```
-apiServer=$(az aro show -g $RESOURCEGROUP -n $CLUSTER --query apiserverProfile.url -o tsv)
-```
-* Login to the OpenShift cluster's API server using the kubeadmin credentials
-```
-oc login $apiServer -u kubeadmin -p $kubeadminpass
-```
-   * You should receive a **Login successful** response after running the command
 * Create a new openshift project
 ```
-    oc new-project workshop \
+    oc new-project workshop
 ``` 
 * Set your current project to the newly created one
 ```
     oc project workshop
 ```
 
-4. **Extra Information. Services will be available at the following address:**
-    - [service name].[project name].svc.cluster.local
-    - E.g. mongodb.ratings-project.svc.cluster.local
-
-
-## Create the MongoDB container app
+## Exercise 2 - Create the MongoDB container app
 1. **Create mongoDB from template**
 * ARO provides a container image and template to make creating a new MongoDB database service easy. We will use the `mongodb-persistent` template to define both a deployment configuration and a service.
 
 * View available templates using the command below. The templates are preinstalled in the openshift namespace.
 ```
     oc get templates -n openshift
+    oc get templates -n openshift | grep mongodb
 ```
-* Deploy
-    oc process openshift//mongodb-persistent \
-        -p MONGODB_USER=ratingsuser \
-        -p MONGODB_PASSWORD=ratingspassword \
-        -p MONGODB_DATABASE=ratingsdb \
-        -p MONGODB_ADMIN_PASSWORD=ratingspassword | oc create -f -
-    
-    # Verify if the mongoDB pod was created successfully
+* Create a mongoDB deployment using the `mongodb-persistent` template. You're passing in the values to be replaced (username, password and database) which generates a YAML/JSON file.
+```
+oc process openshift//mongodb-persistent \
+    -p MONGODB_USER=ratingsuser \
+    -p MONGODB_PASSWORD=ratingspassword \
+    -p MONGODB_DATABASE=ratingsdb \
+    -p MONGODB_ADMIN_PASSWORD=ratingspassword | oc create -f -
+```
+* Verify if the deployment of the mongoDB template was successful using the command line
+>* The prior command created a secret, service, persistentvolumeclaim, and deploymentconfig
+```
     oc get all
-    
-    # Retrieve mongoDB service name
-    oc get svc mongodb
+```    
+
+* Retrieve the mongoDB service name (it will be needed later)
+>* The api app will connect to the database using this name. 
+>* The service will be accessible at the following DNS name: [service name].[project name].svc.cluster.local E.g. mongodb.workshop.svc.cluster.local
+```
+   oc get svc mongodb
+```
+
+* Verify the mongoDB deployment using the web console
+>* You can obtain the console URL using `consoleURL=$(az aro show --name $CLUSTER --resource-group $RESOURCEGROUP --query "consoleProfile.url" -o tsv)`
+** In the web console, switch to the "Developer" view
+** Ensure that the "workshop" project is selected
+** You should see a new deployment for mongoDB.
+
+![Verify mongoDB deployment](../img/4-verify-mongodbapp.png)
 
 
 
 ## **Exercise 3 - Deploy Ratings API App**
-- The `rating-api` is a NodeJS application that connects to mongoDB to retrieve and rate items. 
-- Below are some of the details that you’ll need to deploy this.
-    - `rating-api` on GitHub: [https://github.com/microsoft/rating-api](https://github.com/microsoft/rating-api)
-    - The container exposes port 8080
-    - MongoDB connection is configured using an environment variable called `MONGODB_URI`
-
-
 1. **Fork the application to your own GitHub repository**
     - To be able to setup CI/CD webhooks, you’ll need to fork the application into your personal GitHub repository
-    - https://github.com/microsoft/rating-api/fork → Fork
-
+    - Browse to this URL: https://github.com/microsoft/rating-api/fork then click on your GitHub account to select the destination
+![Fork the ratings API repo](../img/4-github-fork.png)
 
 2. **Use the OpenShift CLI to deploy the** `**rating-api**`
-    - **Note** You’re going to be using [source-to-image (S2I)](https://aroworkshop.io/#source-to-image-s2i) as a build strategy.
-    # Build and deploy the container image as a new app
-    oc new-app https://github.com/davidokeyode/rating-api --strategy=source
-    
-    # Verify
-    oc status
+> **Note** You’re going to be using [source-to-image (S2I)](https://aroworkshop.io/#source-to-image-s2i) as a build strategy.
+>* This will build a container image using the Docker file that is in the root of the repository and deploy the created image as a container
 
+* Build and deploy the container image as a new app
+```
+    oc new-app https://github.com/<your GitHub username>/rating-api --strategy=source
+``` 
+* Verify deployment status
+```
+    oc status
+```
+![Verify the ratings api status](../img/4-verify-ratings-api-status.png)
 
 3. **Configure the required environment variables**
-    - The ***MONGODB_URI*** environment variable is required by the ***ratings-api*** app to connect to the mongodb database
-    # ratingsuser
-    # ratingspassword
+>* The ***MONGODB_URI*** environment variable is required by the ***ratings-api*** app to connect to the mongodb database. We will supply the value to the ratings-api deployment using `oc set env`.
+```
     oc set env deploy/rating-api MONGODB_URI=mongodb://ratingsuser:ratingspassword@mongodb:27017/ratingsdb
-    
-    OR
-    
-    oc set env deploy/rating-api MONGODB_URI=mongodb://ratingsuser:ratingspassword@mongodb.ratings-project.svc.cluster.local:27017/ratingsdb
-    
-    OR
-    
-    Web console (Developer view) --> Project Details --> Overview --> 1 Deployment --> ratings-api --> Environment
+```
+    - OR we can use
+```    
+    oc set env deploy/rating-api MONGODB_URI=mongodb://ratingsuser:ratingspassword@mongodb.workshop.svc.cluster.local:27017/ratingsdb
+```
 
-
+    - OR we can use
+    * Web console (Developer view) --> Project --> Overview --> 1 Deployment --> ratings-api --> Environment
 
 4. **Verify that the service is running**
     - OpenShift web console (Developer view) → Project Details → Overview → 1 Deployment → ratings-api → Pods → Select rating-api Pod → Logs
