@@ -328,4 +328,4 @@ In this lesson, you completed the following:
 
 
 Proceed to the next lesson:
-> [Connect to the ARO cluster](5-explore-aro-internals.md)
+> [Explore ARO Internals](5-explore-aro-internals.md)
