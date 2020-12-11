@@ -21,7 +21,7 @@ In this workshop lesson, you will be deploying a ratings application in your ARO
    * A NodeJS application that connects to the rating-api container app 
    * The web app connects to the API over the internal cluster DNS, using a proxy through an environment variable named API
    * The container exposes port 8080
-   * ratings-api connection is configured using an environment variable called `API` 
+   * rating-api connection is configured using an environment variable called `API` 
    * We'll build the container app using the [source-to-image (S2I) build strategy](https://aroworkshop.io/#source-to-image-s2i)
 
 Once you're done, you'll have an experience similar to the below.
@@ -75,10 +75,10 @@ oc process openshift//mongodb-persistent \
 ```
     oc get all
 ```    
-
 * Retrieve the mongoDB service name (it will be needed later)
->* The api app will connect to the database using this name. 
+>* The api app will connect to the database using this name on port 27017. 
 >* The service will be accessible at the following DNS name: [service name].[project name].svc.cluster.local E.g. mongodb.workshop.svc.cluster.local
+>* This DNS name resolves only within the cluster
 ```
    oc get svc mongodb
 ```
@@ -90,7 +90,6 @@ oc process openshift//mongodb-persistent \
 ** You should see a new deployment for mongoDB.
 
 ![Verify mongoDB deployment](../img/4-verify-mongodbapp.png)
-
 
 
 ## **Exercise 3 - Deploy Ratings API App**
@@ -111,54 +110,75 @@ oc process openshift//mongodb-persistent \
 ```
     oc status
 ```
-![Verify the ratings api status](../img/4-verify-ratings-api-status.png)
+![Verify the ratings api status](../img/4-verify-rating-api-status.png)
 
 3. **Configure the required environment variables**
->* The ***MONGODB_URI*** environment variable is required by the ***ratings-api*** app to connect to the mongodb database. We will supply the value to the ratings-api deployment using `oc set env`.
+>* The ***MONGODB_URI*** environment variable is required by the ***rating-api*** app to connect to the mongodb database. We will supply the value to the rating-api deployment using `oc set env`.
+>* There are three methods to do this
+
+* METHOD 1 - Using the CLI
 ```
     oc set env deploy/rating-api MONGODB_URI=mongodb://ratingsuser:ratingspassword@mongodb:27017/ratingsdb
 ```
-    - OR we can use
-```    
-    oc set env deploy/rating-api MONGODB_URI=mongodb://ratingsuser:ratingspassword@mongodb.workshop.svc.cluster.local:27017/ratingsdb
-```
-
-    - OR we can use
-    * Web console (Developer view) --> Project --> Overview --> 1 Deployment --> ratings-api --> Environment
+* METHOD 2 - Using the Web Console
+    * Web console (Developer view) → Project → Overview → 1 Deployment → rating-api → Environment
 
 4. **Verify that the service is running**
-    - OpenShift web console (Developer view) → Project Details → Overview → 1 Deployment → ratings-api → Pods → Select rating-api Pod → Logs
-        - Verify “CONNECTED TO mongodb://ratingsuser:ratingspassword@mongodb:27017/ratingsdb”
+>* We can verify that our `rating-api` application is able to connect to the mongodb database. We can verify this in the logs.
+>* There are two methods to do this
 
+* METHOD 1 - Using the CLI
+    * Verify that you have the entry `"CONNECTED TO mongodb://ratingsuser:ratingspassword@mongodb:27017/ratingsdb"`
+```
+    oc get pods -n workshop # Obtain the running pods in the workshop project
+    oc logs -f rating-api-xxxxxxxxxx-xxxx -n workshop # Obtain the logs for the rating-api pod. Replace xxxxxxxxxx-xxxx with the actual characters from the pod name
+```
+![Verify the ratings api pod name](../img/4-verify-rating-api-pod.png)
+![Verify the ratings api pod log](../img/4-verify-rating-api-logs.png)
+
+* METHOD 2 - Using the Web Console
+    * OpenShift web console (Developer view) → Project Details → Overview → 1 Deployment → rating-api → Pods → Select rating-api Pod → Logs
+    * Verify that you have the entry `"CONNECTED TO mongodb://ratingsuser:ratingspassword@mongodb:27017/ratingsdb"`
+
+![Verify the ratings api pod log](../img/4-verify-rating-api-logs-web.png)
 
 5. **Retrieve** `**rating-api**` **service hostname**
-    - Obtain the rating-api service hostname using the following command:
-    - [service name].[project name].svc.cluster.local
-    oc get svc rating-api
-
-
+* Retrieve the `rating-api` service name (it will be needed later)
+>* The frontend web app will connect to the api app using this name on port 8080. 
+>* The service will be accessible at the following DNS name: [service name].[project name].svc.cluster.local E.g. rating-api.workshop.svc.cluster.local
+>* This DNS name resolves only within the cluster
+```
+   oc get svc rating-api
+```
 
 6. **Setup GitHub webhook**
-    - To trigger S2I builds when you push code into your GitHib repo, you’ll need to setup the GitHub webhook.
-    # Retrieve the GitHub webhook trigger secret
-    # You’ll need use this secret in the GitHub webhook URL
-    # Make a note of the output
-    oc get bc/rating-api -o=jsonpath='{.spec.triggers..github.secret}'
-    
-    # Retrieve the GitHub webhook trigger URL from the build configuration
-    # Make a note of the "Webhook GitHub URL" section
-    oc describe bc/rating-api
-    
-    # Replace the <secret> placeholder with the secret you retrieved in the previous step to have a URL similar to https://api.otyvsnz3.eastus.aroapp.io:6443/apis/build.openshift.io/v1/namespaces/workshop/buildconfigs/rating-api/webhooks/SECRETSTRING/github.
-    # You’ll use this URL to setup the webhook on your GitHub repository
-    
-    - Go to your GitHub repository and add a webhook
-        - https://github.com/davidokeyode/rating-api →  **Settings** → **Webhooks → Add Webhook**
-            - **Payload URL**: The URL composition from above
-            - **Content type**: application/json
-            - Leave other settings
-            - Add webhook
-    - After adding the webhook, whenever you push a change to your GitHub repository, a new build will automatically start, and upon a successful build a new deployment will start.
+>* To trigger S2I builds when we push code into the GitHib repo, we'll need to setup the GitHub webhook.
+>* This will cause a new container image to be built and deployed when code changes are made in GitHub.
+
+* Retrieve the GitHub webhook trigger secret. We'll need to use this secret in the GitHub webhook URL
+```
+   oc get bc/rating-api -o=jsonpath='{.spec.triggers..github.secret}'
+```
+* Make a note of the secret key in the red box. It will be needed later.
+![Ratings api github secret](../img/4-ratings-api-github-webhook.png)
+
+* Retrieve the GitHub webhook trigger URL from the build configuration
+```
+   oc describe bc/rating-api
+```
+* Make a note of the URL in the "Webhook GitHub URL" section
+* Replace the `<secret>` placeholder with the secret you retrieved in the previous step to have a URL similar to https://api.z8deuehy.uksouth.aroapp.io:6443/apis/build.openshift.io/v1/namespaces/workshop/buildconfigs/rating-api/webhooks/SECRETSTRING/github. We will need this URL to setup the webhook on our GitHub repository
+![Ratings api github webhook](../img/4-ratings-api-github-webhook-bc.png)
+
+* In your GitHub repository and add a webhook
+* Go to https://github.com/<your GitHub username>/rating-api → **Settings** → **Webhooks → Add Webhook**
+    - **Payload URL**: The URL composition from above
+    - **Content type**: application/json
+    - Leave other settings as default
+    - Click on **`Add webhook`**
+![Ratings api github webhook configuration](../img/4-ratings-api-github-webhook-config.png)
+
+* After adding the webhook, whenever we push a change to the GitHub repository, a new build will automatically start, and upon a successful build a new deployment will start.
 
 
 
@@ -176,15 +196,15 @@ oc process openshift//mongodb-persistent \
 
 2. **Use the OpenShift CLI to deploy the** `**rating-web**`
     - We’ll use the [source-to-image (S2I)](https://aroworkshop.io/#source-to-image-s2i) build strategy
-    # Build and deploy the container image as a new app
+    * Build and deploy the container image as a new app
     oc new-app https://github.com/davidokeyode/rating-web --strategy=source
     
-    # Verify
+    * Verify
     oc status
 
 
 3. **Configure the required environment variables**
-    - The ***API*** environment variable is required by the ***ratings-web*** app to connect to the ***ratings-api*** service
+    - The ***API*** environment variable is required by the ***ratings-web*** app to connect to the ***rating-api*** service
     
     oc set env deploy rating-web API=http://rating-api:8080
     
@@ -194,10 +214,10 @@ oc process openshift//mongodb-persistent \
 
 
 4. **Expose the** `**rating-web**` **service using a Route**
-    # Expose the service.
+    * Expose the service.
     oc expose svc/rating-web
     
-    # Find out the created route hostname
+    * Find out the created route hostname
     oc get route rating-web
 
 
@@ -208,17 +228,17 @@ oc process openshift//mongodb-persistent \
 
 6. **Setup GitHub webhook**
     - To trigger S2I builds when you push code into your GitHib repo, you’ll need to setup the GitHub webhook.
-    # Retrieve the GitHub webhook trigger secret
-    # You’ll need use this secret in the GitHub webhook URL
-    # Make a note of the output
+    * Retrieve the GitHub webhook trigger secret
+    * You’ll need use this secret in the GitHub webhook URL
+    * Make a note of the output
     oc get bc/rating-web -o=jsonpath='{.spec.triggers..github.secret}'
     
-    # Retrieve the GitHub webhook trigger URL from the build configuration
-    # Make a note of the "Webhook GitHub URL" section
+    * Retrieve the GitHub webhook trigger URL from the build configuration
+    * Make a note of the "Webhook GitHub URL" section
     oc describe bc/rating-web
     
     # Replace the <secret> placeholder with the secret you retrieved in the previous step to have a URL similar to https://api.otyvsnz3.eastus.aroapp.io:6443/apis/build.openshift.io/v1/namespaces/workshop/buildconfigs/rating-web/webhooks/SECRETSTRING/github.
-    # You’ll use this URL to setup the webhook on your GitHub repository
+    * You’ll use this URL to setup the webhook on your GitHub repository
 
 
     - Go to your GitHub repository and add a webhook
