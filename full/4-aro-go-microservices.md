@@ -110,7 +110,7 @@ oc process openshift//mongodb-persistent \
 ```
     oc status
 ```
-![Verify the ratings api status](../img/4-verify-rating-api-status.png)
+![Verify the ratings api status](../img/4-verify-ratings-api-status.png)
 
 3. **Configure the required environment variables**
 >* The ***MONGODB_URI*** environment variable is required by the ***rating-api*** app to connect to the mongodb database. We will supply the value to the rating-api deployment using `oc set env`.
@@ -133,14 +133,14 @@ oc process openshift//mongodb-persistent \
     oc get pods -n workshop # Obtain the running pods in the workshop project
     oc logs -f rating-api-xxxxxxxxxx-xxxx -n workshop # Obtain the logs for the rating-api pod. Replace xxxxxxxxxx-xxxx with the actual characters from the pod name
 ```
-![Verify the ratings api pod name](../img/4-verify-rating-api-pod.png)
-![Verify the ratings api pod log](../img/4-verify-rating-api-logs.png)
+![Verify the ratings api pod name](../img/4-verify-ratings-api-pod.png)
+![Verify the ratings api pod log](../img/4-verify-ratings-api-logs.png)
 
 * METHOD 2 - Using the Web Console
     * OpenShift web console (Developer view) → Project Details → Overview → 1 Deployment → rating-api → Pods → Select rating-api Pod → Logs
     * Verify that you have the entry `"CONNECTED TO mongodb://ratingsuser:ratingspassword@mongodb:27017/ratingsdb"`
 
-![Verify the ratings api pod log](../img/4-verify-rating-api-logs-web.png)
+![Verify the ratings api pod log](../img/4-verify-ratings-api-logs-web.png)
 
 5. **Retrieve** `**rating-api**` **service hostname**
 * Retrieve the `rating-api` service name (it will be needed later)
